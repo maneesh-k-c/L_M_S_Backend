@@ -100,14 +100,14 @@ studentRouter.post('/update', authCheck, async (req, res) => {
 
             const profData = {
                 loginId: req.userData.loginId,
-                name: profInfo.name,
-                parentName: profInfo.parentName,
-                mobileNumber: profInfo.mobileNumber,
-                dob: profInfo.dob,
-                nationality: profInfo.nationality,
-                countryOfResidence: profInfo.countryOfResidence,
-                curriculam: profInfo.curriculam,
-                grade: profInfo.grade
+                name: req.body.name,
+                parentName: req.body.parentName,
+                mobileNumber: req.body.mobileNumber,
+                dob: req.body.dob,
+                nationality: req.body.nationality,
+                countryOfResidence: req.body.countryOfResidence,
+                curriculam: req.body.curriculam,
+                grade: req.body.grade
             }
 
             const updateProf = await studentRegister.updateOne({ loginId: req.userData.loginId }, { $set: profData })
@@ -141,9 +141,9 @@ studentRouter.post('/password-update', authCheck, async (req, res) => {
     try {
         const profInfo = await login_tb.findOne({ loginId: req.userData.loginId })
         if (profInfo) {
-            const passCheck = await bcrypt.compare({ password: req.body.currentPassword }, profInfo.password)
+            const passCheck = await bcrypt.compare( password= req.body.currentPassword , profInfo.password)
             if (passCheck == true) {
-                const hashed=await bcrypt.hash({password:req.body.password},10)
+                const hashed=await bcrypt.hash(password=req.body.password,10)
                 if (!hashed) {
                     return res.status(404).json({ message: "password hashing error" }) 
                 } else {
@@ -153,6 +153,15 @@ studentRouter.post('/password-update', authCheck, async (req, res) => {
                         password:hashed
                     }
                     const passwordUpdate=await login_tb.updateOne({loginId: req.userData.loginId},{$set:passUpd})
+                    if (passwordUpdate) {
+                        res.status(200).json({
+                            message:"password updated successfully"
+                        })
+                    } else {
+                        res.status(404).json({
+                            message:"password not updated!!!"
+                        })
+                    }
                 }               
 
             } else {
@@ -162,6 +171,7 @@ studentRouter.post('/password-update', authCheck, async (req, res) => {
             }
         }
     } catch (error) {
+        console.log(error);
         res.status(404).json({
             Error: error
         })
