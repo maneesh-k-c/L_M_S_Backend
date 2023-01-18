@@ -1,10 +1,10 @@
 const express = require('express')
 const login_tb = require('../models/login_tb')
 const parentRegister = require('../models/parentRegister')
-const parentRegisterRouter = express.Router()
+const parentRouter = express.Router()
 const bcrypt=require('bcrypt')
 
-parentRegisterRouter.post('/register', async (req, res) => {
+parentRouter.post('/register', async (req, res) => {
     const {
         name, mobileNumber, studentName,
         dob, nationality, countryOfResidence,
@@ -58,4 +58,4 @@ parentRegisterRouter.post('/register', async (req, res) => {
 
 })
 
-module.exports = parentRegisterRouter
+module.exports = parentRouter

@@ -18,7 +18,7 @@ loginRouter.post('/', async (req, res) => {
     } else {
         const hashed = await bcrypt.compare(password, loginDetails.password)
         if (hashed == true) {
-            const token = jwt.sign({ loginId: loginDetails._id }, 'secret007', { expiresIn: "1h" })
+            const token = jwt.sign({ loginId: loginDetails._id }, 'secret_007', { expiresIn: "1h" })
 
             return res.status(200).json({
                 message: "Login successful",

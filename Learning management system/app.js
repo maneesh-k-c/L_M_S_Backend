@@ -1,7 +1,7 @@
 const express = require ('express')
 const loginRouter = require('./src/routes/loginRouter')
-const parentRegisterRouter = require('./src/routes/parentRouter')
-const studentRegisterRouter = require('./src/routes/studentRouter')
+const parentRouter = require('./src/routes/parentRouter')
+const studentRouter = require('./src/routes/studentRouter')
 const teacherRouter = require('./src/routes/teacherRouter')
 const app=express()
 app.use(express.json())
@@ -21,8 +21,8 @@ app.use(function (req, res, next) {
 
 
 app.use('/api/login',loginRouter)
-app.use('/api/parent',parentRegisterRouter)
-app.use('/api/student',studentRegisterRouter)
+app.use('/api/parent',parentRouter)
+app.use('/api/student',studentRouter)
 app.use('/api/teacher',teacherRouter)
 
 app.listen(3001,()=>{

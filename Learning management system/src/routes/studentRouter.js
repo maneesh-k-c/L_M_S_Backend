@@ -1,10 +1,12 @@
 const express = require('express')
 const login_tb = require('../models/login_tb')
 const studentRegister = require('../models/studentRegister')
-const studentRegisterRouter = express.Router()
+const studentRouter = express.Router()
 const bcrypt = require('bcrypt')
+const authCheck = require('../middleware/authCheck')
 
-studentRegisterRouter.post('/register', async (req, res) => {
+//student register api
+studentRouter.post('/register', async (req, res) => {
     const {
         name, parentName,
         mobileNumber, dob,
@@ -42,7 +44,9 @@ studentRegisterRouter.post('/register', async (req, res) => {
                         })
                     } else {
                         return res.status(200).json({
-                            message: "student register data added successfully"
+                            message: "student register data added successfully",
+                            success: true,
+                            error: false
                         })
                     }
 
@@ -59,4 +63,109 @@ studentRegisterRouter.post('/register', async (req, res) => {
 
 })
 
-module.exports = studentRegisterRouter
+//students profile view api
+
+studentRouter.post('/view', authCheck, async (req, res) => {
+
+    try {
+        const profInfo = await studentRegister.findOne({ loginId: req.userData.loginId })
+        if (profInfo) {
+            res.status(200).json({
+                name: profInfo.name,
+                parentName: profInfo.parentName,
+                mobileNumber: profInfo.mobileNumber,
+                dob: profInfo.dob,
+                nationality: profInfo.nationality,
+                countryOfResidence: profInfo.countryOfResidence,
+                curriculam: profInfo.curriculam,
+                grade: profInfo.grade
+            })
+        } else {
+            res.status(404).json({
+                message: "Something went wrong!!!"
+            })
+        }
+    } catch (error) {
+        res.status(404).json({
+            Error: error
+        })
+    }
+})
+
+//students profile update api
+studentRouter.post('/update', authCheck, async (req, res) => {
+    try {
+        const profInfo = await studentRegister.findOne({ loginId: req.userData.loginId })
+        if (profInfo) {
+
+            const profData = {
+                loginId: req.userData.loginId,
+                name: profInfo.name,
+                parentName: profInfo.parentName,
+                mobileNumber: profInfo.mobileNumber,
+                dob: profInfo.dob,
+                nationality: profInfo.nationality,
+                countryOfResidence: profInfo.countryOfResidence,
+                curriculam: profInfo.curriculam,
+                grade: profInfo.grade
+            }
+
+            const updateProf = await studentRegister.updateOne({ loginId: req.userData.loginId }, { $set: profData })
+            if (updateProf) {
+                return res.status(200).json({
+                    message: "student profile data updated successfully",
+                    success: true,
+                    error: false
+                })
+            } else {
+                res.status(404).json({
+                    message: "Something went wrong in updation!!!",
+                    success: false,
+                    error: true
+                })
+            }
+        } else {
+            res.status(404).json({
+                message: "Something went wrong!!!"
+            })
+        }
+    } catch (error) {
+        res.status(404).json({
+            Error: error
+        })
+    }
+})
+
+//student password update api
+studentRouter.post('/password-update', authCheck, async (req, res) => {
+    try {
+        const profInfo = await login_tb.findOne({ loginId: req.userData.loginId })
+        if (profInfo) {
+            const passCheck = await bcrypt.compare({ password: req.body.currentPassword }, profInfo.password)
+            if (passCheck == true) {
+                const hashed=await bcrypt.hash({password:req.body.password},10)
+                if (!hashed) {
+                    return res.status(404).json({ message: "password hashing error" }) 
+                } else {
+                    const passUpd={
+                        email:profInfo.email,
+                        role:profInfo.role,
+                        password:hashed
+                    }
+                    const passwordUpdate=await login_tb.updateOne({loginId: req.userData.loginId},{$set:passUpd})
+                }               
+
+            } else {
+                res.status(404).json({
+                    message:"Entered current password is wrong!!!"
+                })
+            }
+        }
+    } catch (error) {
+        res.status(404).json({
+            Error: error
+        })
+    }
+})
+
+module.exports = studentRouter
