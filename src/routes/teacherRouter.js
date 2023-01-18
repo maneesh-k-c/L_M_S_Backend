@@ -89,4 +89,40 @@ teacherRouter.post('/register', upload.single("cv"), async (req, res) => {
 
 })
 
+teacherRouter.post('/teacher-view', checkAuth, async (req, res) => {
+    const TeacherDetails = await login_tb.findOne({ loginId: req.userdata._id })
+    try {
+        if (!TeacherDetails) {
+            res.status(404).json({ message: "data is not occured" })
+        } else {
+            res.status(200).json({
+                TeacherDetails: {
+                    loginId: login._id,
+                    name: TeacherDetails.name,
+                    mobileNumber: TeacherDetails.mobileNumber,
+                    whatsappNumber: TeacherDetails.whatsappNumber,
+                    DateOfBirth: TeacherDetails.DateOfBirth,
+                    gender: TeacherDetails.gender,
+                    address: TeacherDetails.address,
+                    passionateTeachingDescription: TeacherDetails.passionateTeachingDescription,
+                    experienceDescription: TeacherDetails.experienceDescription,
+                    academicDescription: TeacherDetails.academicDescription,
+                    websiteDescription: TeacherDetails.websiteDescription,
+                    tutoringTimeDescription: TeacherDetails.tutoringTimeDescription,
+                    subjectExpertiseDescription: TeacherDetails.subjectExpertiseDescription
+                }
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(404).json({ ERROR: error })
+    }
+
+})
+
+
+
+
+
+
 module.exports = teacherRouter
