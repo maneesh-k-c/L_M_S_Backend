@@ -141,9 +141,9 @@ studentRouter.post('/password-update', authCheck, async (req, res) => {
     try {
         const profInfo = await login_tb.findOne({ loginId: req.userData.loginId })
         if (profInfo) {
-            const passCheck = await bcrypt.compare( password= req.body.currentPassword , profInfo.password)
+            const passCheck = await bcrypt.compare( req.body.currentPassword , profInfo.password)
             if (passCheck == true) {
-                const hashed=await bcrypt.hash(password=req.body.password,10)
+                const hashed=await bcrypt.hash(req.body.password,10)
                 if (!hashed) {
                     return res.status(404).json({ message: "password hashing error" }) 
                 } else {
