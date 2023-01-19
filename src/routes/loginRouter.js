@@ -10,7 +10,7 @@ loginRouter.post('/', async (req, res) => {
     const {  email, password } = req.body
 
     const loginDetails = await login_tb.findOne({ email })
-    console.log(loginDetails.role);
+    // console.log(loginDetails.role);
     if (!loginDetails) {
         res.status(400).json({
             message: "Email doesn't exists"
